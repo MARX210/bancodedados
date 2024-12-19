@@ -1,13 +1,19 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { neon } from "@neondatabase/serverless";
+import { redirect } from "next/navigation";
+
 
 async function registerStudent(formData: FormData) {
   'use server'
-  const name = formData.get('name')
-  const email = formData.get('email')
+  const name = formData.get('name') as string
+  const email = formData.get('email') as string
+  const sql = neon(`${process.env.DATABASE_URL}`);
+  await sql`INSERT INTO students (name, email) VALUES (${name}, ${email})`
   console.log('Registering student:', { name, email })
   await new Promise(resolve => setTimeout(resolve, 1000))
+  redirect('/dashboard/student/list')
 }
 
 export default function StudentRegistration() {
